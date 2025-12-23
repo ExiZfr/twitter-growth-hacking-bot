@@ -76,7 +76,11 @@ class AIResponder:
             # 1. Cliquer sur le bouton Répondre (Reply)
             reply_button = await tweet.element.query_selector("button[data-testid='reply']")
             if not reply_button:
-                # Fallback sur un autre testid possible
+                # Fallback tweetButton
+                reply_button = await tweet.element.query_selector("button[data-testid='tweetButton']")
+            
+            if not reply_button:
+                # Fallback tweetButtonInline
                 reply_button = await tweet.element.query_selector("button[data-testid='tweetButtonInline']")
             
             if not reply_button:
