@@ -80,6 +80,15 @@ class AIResponder:
                 reply_button = await tweet.element.query_selector("button[data-testid='tweetButtonInline']")
             
             if not reply_button:
+                # Fallback sur le texte "Reply"
+                buttons = await tweet.element.query_selector_all("button")
+                for btn in buttons:
+                    text_content = await btn.text_content()
+                    if text_content and "Reply" in text_content:
+                        reply_button = btn
+                        break
+            
+            if not reply_button:
                 logger.error("Bouton 'reply' non trouvé sur le tweet")
                 return False
                 
