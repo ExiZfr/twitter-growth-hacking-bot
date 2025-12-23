@@ -119,7 +119,7 @@ class XReplyBot:
                     await self.notifier.send_log(f"🤖 **Réponse générée**\n💭 \"{reply}\"")
                     
                     # 3. Poster la réponse
-                    success = await self.responder.post_reply(self.scroller.page, tweet, reply)
+                    success = await self.responder.post_reply(self.scroller.page, tweet.url, reply)
                     
                     if success:
                         replies_posted_count += 1
