@@ -48,6 +48,55 @@ LANGUAGE_FILTER = "en"             # Filtrer uniquement les tweets anglais
 MIN_RETWEETS = 0                   # Minimum de retweets (optionnel)
 
 # =========================================
+# FILTRAGE PAR TOPICS (TECH FOCUS)
+# =========================================
+ALLOWED_KEYWORDS = [
+    # Tech/Programming
+    "code", "programming", "developer", "coding", "software", "engineer",
+    "python", "javascript", "rust", "go", "typescript", "react", "node",
+    "api", "framework", "library", "open source", "github", "git",
+    "backend", "frontend", "fullstack", "web dev", "mobile dev",
+    
+    # Cybersecurity
+    "security", "cybersecurity", "vulnerability", "exploit", "penetration",
+    "encryption", "malware", "hacking", "zero day", "infosec", "bug bounty",
+    "authentication", "firewall", "threat", "breach", "ctf", "pentest",
+    
+    # Blockchain (tech only)
+    "blockchain", "smart contract", "solidity", "ethereum", "web3",
+    "defi", "nft", "consensus", "proof of stake", "proof of work",
+    "layer 2", "rollup", "zk-proof", "evm", "dapp",
+    
+    # AI/ML
+    "ai", "artificial intelligence", "machine learning", "deep learning",
+    "neural network", "llm", "gpt", "claude", "chatgpt", "openai",
+    "anthropic", "transformer", "model", "training", "inference",
+    "agi", "alignment", "prompt engineering", "fine tuning",
+    
+    # General tech
+    "algorithm", "data structure", "database", "cloud", "docker",
+    "kubernetes", "devops", "ci/cd", "testing", "debugging", "aws",
+    "performance", "optimization", "scalability", "architecture"
+]
+
+BLOCKED_KEYWORDS = [
+    # Politics (STRICT)
+    "election", "president", "senate", "congress", "democrat", "republican",
+    "liberal", "conservative", "biden", "government", "legislation",
+    "policy", "vote", "campaign", "politician", "political", "politics",
+    "trump", "epstein",
+    
+    # Conspiracy theories
+    "conspiracy", "illuminati", "deep state", "qanon", "fake news",
+    "mainstream media", "msm", "agenda", "they don't want you to know",
+    "wake up", "sheeple", "false flag",
+    
+    # Crypto trading (keep tech, remove speculation)
+    "buy", "sell", "trading", "pump", "moon", "lambo", "hodl",
+    "bullish", "bearish", "price prediction", "to the moon", "wen moon"
+]
+
+# =========================================
 # COMPORTEMENT HUMAIN
 # =========================================
 SCROLL_DELAY_MIN = 2.0             # Délai minimum entre scrolls (secondes)
@@ -97,23 +146,32 @@ LOG_FILE = "bot.log"
 # =========================================
 # PERSONA IA - System Prompt
 # =========================================
-AI_SYSTEM_PROMPT = """You are a regular Twitter user, NOT an AI assistant. You respond with a natural, human tone in English.
+AI_SYSTEM_PROMPT = """You are a tech-savvy Twitter user passionate about coding, cybersecurity, blockchain tech, and AI. NOT an AI assistant.
 
 STRICT RULES:
 - SHORT responses (1-2 sentences maximum, never more)
-- Sarcastic, edgy, or strong opinionated tone depending on context
+- Tech-focused, knowledgeable tone
 - Use natural English internet slang/idioms
 - NEVER use a "helpful assistant" or robotic tone
 - No excessive emojis (max 1 if relevant)
-- You can be critical, provocative, or just give your blunt opinion
+- Be critical, provocative, or give your blunt technical opinion
 - Avoid platitudes and generic responses
 - NEVER start with "I think that" or similar formulas
 - NEVER use hyphens/dashes ("-") in your response
+- NEVER discuss politics or political figures
+- Focus on TECH aspects, not financial speculation
 
-APPROPRIATE TONE EXAMPLES:
-- "Groundbreaking discovery right here 🙄"
-- "Imagine actually believing this"
-- "Absolute peak fiction"
-- "The PR team is sweating right now"
-- "Too real."
+TOPICS YOU CARE ABOUT:
+- Programming & software development
+- Cybersecurity & infosec
+- Blockchain technology (NOT crypto trading/prices)
+- AI/ML innovations & research
+- Developer tools & workflows
+
+TONE EXAMPLES:
+- "This code is going to break in production 100%"
+- "Zero days dropping left and right, patch your stuff"
+- "Finally someone who gets how transformers actually work"
+- "Classic example of why you should never trust user input"
+- "Absolute chad move implementing this in Rust"
 """

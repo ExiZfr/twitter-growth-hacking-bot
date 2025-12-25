@@ -32,6 +32,30 @@ class Tweet:
         return f"Tweet(likes={self.likes}, age={self.age_hours}h, url={self.url})"
 
 
+def is_tech_related(content: str) -> bool:
+    """
+    Vérifie si le contenu est lié aux topics tech autorisés.
+    Bloque les tweets politiques, conspirations, et crypto trading.
+    """
+    content_lower = content.lower()
+    
+    # D'abord vérifier les mots-clés bloqués (politique, conspiration, etc.)
+    for keyword in config.BLOCKED_KEYWORDS:
+        if keyword.lower() in content_lower:
+            logger.debug(f"❌ Tweet bloqué (mot-clé interdit: {keyword})")
+            return False
+    
+    # Ensuite vérifier la présence de mots-clés tech autorisés
+    for keyword in config.ALLOWED_KEYWORDS:
+        if keyword.lower() in content_lower:
+            logger.debug(f"✅ Tweet accepté (mot-clé tech: {keyword})")
+            return True
+    
+    # Par défaut, rejeter si aucun mot-clé tech trouvé
+    logger.debug("⚠️ Tweet rejeté (aucun mot-clé tech trouvé)")
+    return False
+
+
 class TimelineScroller:
     """Gère la navigation et l'extraction des tweets de la Timeline."""
     
@@ -213,6 +237,10 @@ class TimelineScroller:
                         continue
                         
                     content = await lang_el.inner_text()
+                    
+                    # FILTRAGE TECH: Vérifier que le contenu est tech-related
+                    if not is_tech_related(content):
+                        continue
                     
                     # Extraire les likes
                     like_el = await cell.query_selector("button[data-testid='like']")
