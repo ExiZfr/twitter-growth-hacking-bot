@@ -107,12 +107,13 @@ class XReplyBot:
             await self.notifier.send_log(f"✅ **{len(tweets)} tweets qualifiés**\n⏳ Début du traitement...")
             logger.info(f"{len(tweets)} tweets qualifiés trouvés. Traitement...")
             
+            
             for tweet in tweets:
                 # Notifier qu'on traite ce tweet
                 await self.notifier.send_log(f"🔍 **Tweet trouvé**\n{tweet.url}\n💬 {tweet.content[:100]}...")
                 
-                # 2. Générer une réponse
-                reply = await self.responder.generate_reply(tweet.content)
+                # 2. Générer une réponse (avec détection following)
+                reply = await self.responder.generate_reply(tweet.content, page=self.scroller.page, tweet_url=tweet.url)
                 
                 if reply:
                     # Notifier de la réponse générée

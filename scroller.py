@@ -35,25 +35,33 @@ class Tweet:
 def is_tech_related(content: str) -> bool:
     """
     Vérifie si le contenu est lié aux topics tech autorisés.
-    Bloque les tweets politiques, conspirations, et crypto trading.
+    STRICT: Bloque immédiatement si mots-clés interdits, même avec tech keywords.
+    Requiert au moins 2 mots-clés tech pour accepter.
     """
     content_lower = content.lower()
     
-    # D'abord vérifier les mots-clés bloqués (politique, conspiration, etc.)
+    # PRIORITÉ 1: Bloquer IMMÉDIATEMENT si mots-clés interdits (politique, conspiration)
     for keyword in config.BLOCKED_KEYWORDS:
         if keyword.lower() in content_lower:
-            logger.debug(f"❌ Tweet bloqué (mot-clé interdit: {keyword})")
+            logger.debug(f"❌ Tweet BLOQUÉ (mot-clé interdit: {keyword})")
             return False
     
-    # Ensuite vérifier la présence de mots-clés tech autorisés
+    # PRIORITÉ 2: Compter les mots-clés tech trouvés
+    tech_keywords_found = []
     for keyword in config.ALLOWED_KEYWORDS:
         if keyword.lower() in content_lower:
-            logger.debug(f"✅ Tweet accepté (mot-clé tech: {keyword})")
-            return True
+            tech_keywords_found.append(keyword)
     
-    # Par défaut, rejeter si aucun mot-clé tech trouvé
-    logger.debug("⚠️ Tweet rejeté (aucun mot-clé tech trouvé)")
-    return False
+    # Requiert AU MOINS 2 mots-clés tech pour être accepté
+    if len(tech_keywords_found) >= 2:
+        logger.debug(f"✅ Tweet ACCEPTÉ ({len(tech_keywords_found)} mots-clés tech: {', '.join(tech_keywords_found[:3])}...)")
+        return True
+    elif len(tech_keywords_found) == 1:
+        logger.debug(f"⚠️ Tweet REJETÉ (seulement 1 mot-clé tech: {tech_keywords_found[0]}, minimum 2 requis)")
+        return False
+    else:
+        logger.debug("⚠️ Tweet REJETÉ (aucun mot-clé tech trouvé)")
+        return False
 
 
 class TimelineScroller:
