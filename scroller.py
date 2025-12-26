@@ -20,45 +20,42 @@ from proxies import ProxyRotator, ProxyConfig
 
 class Tweet:
     """Représente un tweet extrait de la timeline."""
-    def __init__(self, element: ElementHandle, content: str, url: str, likes: int, time_text: str):
+    def __init__(self, element: ElementHandle, content: str, url: str, likes: int, time_text: str, is_following: bool = False):
         self.element = element
         self.content = content
         self.url = url
         self.likes = likes
         self.time_text = time_text
         self.age_hours = utils.parse_tweet_age(time_text)
+        self.is_following = is_following  # True si l'auteur est suivi
 
     def __str__(self):
-        return f"Tweet(likes={self.likes}, age={self.age_hours}h, url={self.url})"
+        follow_status = " [FOLLOWING]" if self.is_following else ""
+        return f"Tweet(likes={self.likes}, age={self.age_hours}h{follow_status}, url={self.url})"
 
 
 def is_tech_related(content: str) -> bool:
     """
     Vérifie si le contenu est lié aux topics tech autorisés.
-    STRICT: Bloque immédiatement si mots-clés interdits, même avec tech keywords.
-    Requiert au moins 2 mots-clés tech pour accepter.
+    Bloque les tweets politiques, conspirations, et crypto trading.
     """
     content_lower = content.lower()
     
-    # PRIORITÉ 1: Bloquer IMMÉDIATEMENT si mots-clés interdits (politique, conspiration)
+    # D'abord vérifier les mots-clés bloqués (politique, conspiration, etc.)
     for keyword in config.BLOCKED_KEYWORDS:
         if keyword.lower() in content_lower:
-            logger.debug(f"❌ Tweet BLOQUÉ (mot-clé interdit: {keyword})")
+            logger.debug(f"❌ Tweet bloqué (mot-clé interdit: {keyword})")
             return False
     
-    # PRIORITÉ 2: Compter les mots-clés tech trouvés
-    tech_keywords_found = []
+    # Ensuite vérifier la présence de mots-clés tech autorisés
     for keyword in config.ALLOWED_KEYWORDS:
         if keyword.lower() in content_lower:
-            tech_keywords_found.append(keyword)
+            logger.debug(f"✅ Tweet accepté (mot-clé tech: {keyword})")
+            return True
     
-    # Requiert AU MOINS 1 mot-clé tech pour être accepté (réduit de 2 à 1 car trop strict)
-    if len(tech_keywords_found) >= 1:
-        logger.debug(f"✅ Tweet ACCEPTÉ ({len(tech_keywords_found)} mot(s)-clé(s) tech: {', '.join(tech_keywords_found[:3])}...)")
-        return True
-    else:
-        logger.debug("⚠️ Tweet REJETÉ (aucun mot-clé tech trouvé)")
-        return False
+    # Par défaut, rejeter si aucun mot-clé tech trouvé
+    logger.debug("⚠️ Tweet rejeté (aucun mot-clé tech trouvé)")
+    return False
 
 
 class TimelineScroller:
@@ -268,14 +265,25 @@ class TimelineScroller:
                     tweet_url = "https://x.com" + await link_el.get_attribute("href")
                     tweet_id = tweet_url.split("/")[-1]
                     
+                    # Détecter si l'auteur est suivi
+                    is_following = False
+                    try:
+                        # Chercher le bouton Following dans le tweet
+                        following_btn = await cell.query_selector("button[data-testid$='unfollow']")
+                        if following_btn:
+                            is_following = True
+                    except:
+                        pass
+                    
                     # Vérifier les critères pour réponse
                     if (likes >= config.MIN_LIKES and 
                         age_hours <= config.MAX_TWEET_AGE_HOURS and 
                         tweet_id not in self.seen_tweet_ids):
                         
-                        logger.info(f"Tweet qualifié trouvé: {tweet_url} ({likes} likes, {age_hours}h)")
+                        follow_label = " [FOLLOWING]" if is_following else ""
+                        logger.info(f"Tweet qualifié trouvé: {tweet_url} ({likes} likes, {age_hours}h){follow_label}")
                         
-                        tweet_obj = Tweet(cell, content, tweet_url, likes, time_text)
+                        tweet_obj = Tweet(cell, content, tweet_url, likes, time_text, is_following)
                         qualified_tweets.append(tweet_obj)
                         self.seen_tweet_ids.add(tweet_id)
                         

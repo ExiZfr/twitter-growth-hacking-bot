@@ -20,37 +20,21 @@ class AIResponder:
         self.client = OpenAI(api_key=config.OPENAI_API_KEY)
         self.model = config.OPENAI_MODEL
 
-    async def generate_reply(self, tweet_content: str, page: Page = None, tweet_url: str = None) -> str:
-        """Génère une réponse avec GPT-5-mini. Utilise un ton friendly pour les comptes suivis."""
+    async def generate_reply(self, tweet_content: str, is_following: bool = False) -> str:
+        """Génère une réponse avec GPT-5-mini."""
         if not tweet_content:
             return ""
         
-        # Déterminer si on suit ce compte
-        is_following = False
-        if page and tweet_url:
-            try:
-                # Naviguer vers le tweet pour vérifier le statut following
-                await page.goto(tweet_url, wait_until="domcontentloaded", timeout=10000)
-                await utils.random_delay(1, 2)
-                
-                # Chercher le bouton "Following" (si on suit le compte)
-                following_btn = await page.query_selector("button[data-testid*='unfollow']")  
-                is_following = following_btn is not None
-                
-                if is_following:
-                    logger.info("   Compte suivi détecté, utilisation du ton FRIENDLY")
-            except Exception as e:
-                logger.debug(f"Impossible de vérifier le statut following: {e}")
-            
-        logger.info(f"Génération de réponse pour le tweet: {tweet_content[:50]}...")
+        follow_label = " [FOLLOWING]" if is_following else ""
+        logger.info(f"Génération de réponse pour le tweet{follow_label}: {tweet_content[:50]}...")
         
         try:
-            # Choisir le prompt selon si on suit le compte
+            # Choisir le prompt selon si l'auteur est suivi
             system_prompt = config.AI_SYSTEM_PROMPT_FRIENDLY if is_following else config.AI_SYSTEM_PROMPT
-            tone_instruction = "friendly and supportive" if is_following else "blunt and technical"
+            tone_reminder = "Be friendly and supportive" if is_following else "Be short, human-like, and blunt"
             
             # Pour gpt-5-mini (type o1), on passe tout en 'user'
-            full_prompt = f"{system_prompt}\n\nTweet to reply to: \"{tweet_content}\"\n\nRemember: Be short, {tone_instruction}, human-like. English only."
+            full_prompt = f"{system_prompt}\n\nTweet to reply to: \"{tweet_content}\"\n\nRemember: {tone_reminder}. English only."
             
             # Exécution dans un thread séparé pour ne pas bloquer la loop principale
             # et éviter les crashs liés au client asynchrone

@@ -107,26 +107,26 @@ class XReplyBot:
             await self.notifier.send_log(f"✅ **{len(tweets)} tweets qualifiés**\n⏳ Début du traitement...")
             logger.info(f"{len(tweets)} tweets qualifiés trouvés. Traitement...")
             
-            
+            # Traiter chaque tweet qualifié
             for tweet in tweets:
-                # Notifier qu'on traite ce tweet
-                await self.notifier.send_log(f"🔍 **Tweet trouvé**\n{tweet.url}\n💬 {tweet.content[:100]}...")
-                
-                # 2. Générer une réponse (avec détection following)
-                reply = await self.responder.generate_reply(tweet.content, page=self.scroller.page, tweet_url=tweet.url)
-                
-                if reply:
-                    # Notifier de la réponse générée
-                    await self.notifier.send_log(f"🤖 **Réponse générée**\n💭 \"{reply}\"")
+                try:
+                    # Générer une réponse avec l'IA
+                    reply = await self.responder.generate_reply(tweet.content, tweet.is_following)
                     
-                    # 3. Poster la réponse
-                    success = await self.responder.post_reply(self.scroller.page, tweet.url, reply)
+                    if not reply:
+                        logger.warning(f"Impossible de générer une réponse pour: {tweet.url}")
+                        continue
+                    
+                    # Délai aléatoire pour éviter la détection
+                    await utils.random_delay(config.REPLY_DELAY_MIN, config.REPLY_DELAY_MAX)
+                    
+                    # Poster la réponse
+                    success = await self.responder.post_reply(self.scroller.page, tweet, reply)
                     
                     if success:
                         replies_posted_count += 1
                         # 4. Notifier Telegram
                         await self.notifier.send_notification(tweet.url, reply)
-                        
                         # Délai entre les réponses pour paraître humain
                         wait_time = random.randint(config.REPLY_DELAY_MIN, config.REPLY_DELAY_MAX)
                         await self.notifier.send_log(f"⏳ **Attente {wait_time}s** avant prochain tweet...")
