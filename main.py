@@ -104,8 +104,8 @@ class XReplyBot:
                 logger.info("Aucun tweet qualifié trouvé dans ce cycle.")
                 return
 
-            await self.notifier.send_log(f"✅ **{len(tweets)} tweets qualifiés**\n⏳ Début du traitement...")
-            logger.info(f"{len(tweets)} tweets qualifiés trouvés. Traitement...")
+            await self.notifier.send_log(f"✅ **{len(qualified_tweets)} tweets qualifiés**\n⏳ Début du traitement...")
+            logger.info(f"{len(qualified_tweets)} tweets qualifiés trouvés. Traitement...")
             
             # Traiter chaque tweet qualifié
             for tweet in tweets:
@@ -125,7 +125,7 @@ class XReplyBot:
                     
                     if success:
                         replies_posted_count += 1
-                        # 4. Notifier Telegram
+                        # Notifier Telegram
                         await self.notifier.send_notification(tweet.url, reply)
                         # Délai entre les réponses pour paraître humain
                         wait_time = random.randint(config.REPLY_DELAY_MIN, config.REPLY_DELAY_MAX)
@@ -133,9 +133,10 @@ class XReplyBot:
                         await asyncio.sleep(wait_time)
                     else:
                         await self.notifier.send_log(f"⚠️ **Échec du post**\n{tweet.url}")
-                else:
-                    await self.notifier.send_log(f"⚠️ **Pas de réponse générée**\n{tweet.url}")
-                    logger.warning(f"Saut du tweet {tweet.url} (IA n'a pas généré de réponse)")
+                        
+                except Exception as tweet_error:
+                    logger.error(f"Erreur lors du traitement du tweet {tweet.url}: {tweet_error}")
+                    continue
 
             # Sauvegarder les stats pour le prochain cycle
             self.last_tweets_found = len(tweets) if tweets else 0
