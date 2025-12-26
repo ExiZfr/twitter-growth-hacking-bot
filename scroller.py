@@ -52,13 +52,10 @@ def is_tech_related(content: str) -> bool:
         if keyword.lower() in content_lower:
             tech_keywords_found.append(keyword)
     
-    # Requiert AU MOINS 2 mots-clés tech pour être accepté
-    if len(tech_keywords_found) >= 2:
-        logger.debug(f"✅ Tweet ACCEPTÉ ({len(tech_keywords_found)} mots-clés tech: {', '.join(tech_keywords_found[:3])}...)")
+    # Requiert AU MOINS 1 mot-clé tech pour être accepté (réduit de 2 à 1 car trop strict)
+    if len(tech_keywords_found) >= 1:
+        logger.debug(f"✅ Tweet ACCEPTÉ ({len(tech_keywords_found)} mot(s)-clé(s) tech: {', '.join(tech_keywords_found[:3])}...)")
         return True
-    elif len(tech_keywords_found) == 1:
-        logger.debug(f"⚠️ Tweet REJETÉ (seulement 1 mot-clé tech: {tech_keywords_found[0]}, minimum 2 requis)")
-        return False
     else:
         logger.debug("⚠️ Tweet REJETÉ (aucun mot-clé tech trouvé)")
         return False
