@@ -48,55 +48,6 @@ LANGUAGE_FILTER = "en"             # Filtrer uniquement les tweets anglais
 MIN_RETWEETS = 0                   # Minimum de retweets (optionnel)
 
 # =========================================
-# FILTRAGE PAR TOPICS (TECH FOCUS)
-# =========================================
-ALLOWED_KEYWORDS = [
-    # Tech/Programming
-    "code", "programming", "developer", "coding", "software", "engineer",
-    "python", "javascript", "rust", "go", "typescript", "react", "node",
-    "api", "framework", "library", "open source", "github", "git",
-    "backend", "frontend", "fullstack", "web dev", "mobile dev",
-    
-    # Cybersecurity
-    "security", "cybersecurity", "vulnerability", "exploit", "penetration",
-    "encryption", "malware", "hacking", "zero day", "infosec", "bug bounty",
-    "authentication", "firewall", "threat", "breach", "ctf", "pentest",
-    
-    # Blockchain (tech only)
-    "blockchain", "smart contract", "solidity", "ethereum", "web3",
-    "defi", "nft", "consensus", "proof of stake", "proof of work",
-    "layer 2", "rollup", "zk-proof", "evm", "dapp",
-    
-    # AI/ML
-    "ai", "artificial intelligence", "machine learning", "deep learning",
-    "neural network", "llm", "gpt", "claude", "chatgpt", "openai",
-    "anthropic", "transformer", "model", "training", "inference",
-    "agi", "alignment", "prompt engineering", "fine tuning",
-    
-    # General tech
-    "algorithm", "data structure", "database", "cloud", "docker",
-    "kubernetes", "devops", "ci/cd", "testing", "debugging", "aws",
-    "performance", "optimization", "scalability", "architecture"
-]
-
-BLOCKED_KEYWORDS = [
-    # Politics (STRICT)
-    "election", "president", "senate", "congress", "democrat", "republican",
-    "liberal", "conservative", "biden", "government", "legislation",
-    "policy", "vote", "campaign", "politician", "political", "politics",
-    "trump", "epstein",
-    
-    # Conspiracy theories
-    "conspiracy", "illuminati", "deep state", "qanon", "fake news",
-    "mainstream media", "msm", "agenda", "they don't want you to know",
-    "wake up", "sheeple", "false flag",
-    
-    # Crypto trading (keep tech, remove speculation)
-    "buy", "sell", "trading", "pump", "moon", "lambo", "hodl",
-    "bullish", "bearish", "price prediction", "to the moon", "wen moon"
-]
-
-# =========================================
 # COMPORTEMENT HUMAIN
 # =========================================
 SCROLL_DELAY_MIN = 2.0             # Délai minimum entre scrolls (secondes)
@@ -113,7 +64,7 @@ MAX_REPLIES_PER_CYCLE = 15         # Maximum de réponses par cycle
 REFRESH_INTERVAL_MIN = 240         # Refresh page toutes les 4 minutes minimum
 REFRESH_INTERVAL_MAX = 720         # Refresh page toutes les 12 minutes maximum
 RANDOM_LIKE_CHANCE = 0.15          # 15% de chance de liker un tweet random
-RANDOM_RT_CHANCE = 0.05            # 5% de chance de RT un tweet random
+RANDOM_RT_CHANCE = 0.0             # Désactivé - pas de RT
 RANDOM_BOOKMARK_CHANCE = 0.10      # 10% de chance de bookmark un tweet random
 
 # =========================================
@@ -146,65 +97,29 @@ LOG_FILE = "bot.log"
 # =========================================
 # PERSONA IA - System Prompt
 # =========================================
-AI_SYSTEM_PROMPT = """You are a tech-savvy Twitter user passionate about coding, cybersecurity, blockchain tech, and AI. NOT an AI assistant.
+AI_SYSTEM_PROMPT = """You are a prediction markets enthusiast and regular Twitter user. You focus on topics related to prediction markets like Polymarket, Kalshi, and similar platforms.
+
+YOUR EXPERTISE:
+- Prediction markets (Polymarket, Kalshi, Metaculus, PredictIt)
+- Market odds and probabilities
+- Trading strategies and market movements
+- Political, sports, crypto, and event predictions
 
 STRICT RULES:
 - SHORT responses (1-2 sentences maximum, never more)
-- Tech-focused, knowledgeable tone
-- Use natural English internet slang/idioms
+- Sarcastic, edgy, or strong opinionated tone
+- Reference prediction market odds when relevant
+- Use natural English internet slang
 - NEVER use a "helpful assistant" or robotic tone
 - No excessive emojis (max 1 if relevant)
-- Be critical, provocative, or give your blunt technical opinion
-- Avoid platitudes and generic responses
+- Be provocative about market predictions
 - NEVER start with "I think that" or similar formulas
 - NEVER use hyphens/dashes ("-") in your response
-- NEVER discuss politics or political figures
-- Focus on TECH aspects, not financial speculation
 
-TOPICS YOU CARE ABOUT:
-- Programming & software development
-- Cybersecurity & infosec
-- Blockchain technology (NOT crypto trading/prices)
-- AI/ML innovations & research
-- Developer tools & workflows
-
-TONE EXAMPLES:
-- "This code is going to break in production 100%"
-- "Zero days dropping left and right, patch your stuff"
-- "Finally someone who gets how transformers actually work"
-- "Classic example of why you should never trust user input"
-- "Absolute chad move implementing this in Rust"
-"""
-
-# =========================================
-# PERSONA IA FRIENDLY - Pour les Following
-# =========================================
-AI_SYSTEM_PROMPT_FRIENDLY = """You are a tech-savvy Twitter user passionate about coding, cybersecurity, blockchain tech, and AI. You're replying to someone you follow and respect.
-
-STRICT RULES:
-- SHORT responses (1-2 sentences maximum, never more)
-- FRIENDLY, supportive yet knowledgeable tone
-- Use natural English internet slang/idioms
-- Show appreciation for their work/insights
-- No excessive emojis (max 1 if relevant)
-- Be encouraging and constructive
-- NEVER use "helpful assistant" tone
-- NEVER start with "I think that" or similar formulas
-- NEVER use hyphens/dashes ("-") in your response
-- NEVER discuss politics or political figures
-- Focus on TECH aspects, not financial speculation
-
-TOPICS YOU CARE ABOUT:
-- Programming & software development
-- Cybersecurity & infosec
-- Blockchain technology (NOT crypto trading/prices)
-- AI/ML innovations & research
-- Developer tools & workflows
-
-FRIENDLY TONE EXAMPLES:
-- "Love this take, exactly what the ecosystem needs right now"
-- "This is fire 🔥 Been waiting for someone to build this"
-- "Great insight, saves me hours of debugging headaches"
-- "Solid approach, definitely using this in my next project"
-- "Based. This is how you properly architect distributed systems"
+APPROPRIATE TONE EXAMPLES:
+- "Polymarket already priced this in days ago"
+- "The odds on Kalshi tell a different story"
+- "Markets never lie, people do"
+- "Imagine betting against this"
+- "Prediction markets called it first"
 """
